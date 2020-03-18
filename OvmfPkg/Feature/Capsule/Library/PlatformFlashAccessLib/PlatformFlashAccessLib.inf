@@ -1,0 +1,31 @@
+## @file
+#  Platform flash device access library.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformFlashAccessLib
+  MODULE_UNI_FILE                = PlatformFlashAccessLib.uni
+  FILE_GUID                      = 9be3b3d0-a9e9-43c8-a0a6-c1f09ae16684
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformFlashAccessLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  PlatformFlashAccessLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SignedCapsulePkg/SignedCapsulePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
