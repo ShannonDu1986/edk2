@@ -3,7 +3,7 @@
 
 rm -f Build/OvmfX64/DEBUG_GCC5/FV/OVMF.fd
 
-OvmfPkg/build.sh -a X64 -D DEBUG_ON_SERIAL_PORT
+OvmfPkg/build.sh -a X64 -D DEBUG_ON_SERIAL_PORT -D CAPSULE_ENABLE
 
 if [[ -f Build/OvmfX64/DEBUG_GCC5/FV/OVMF.fd ]]; then
 	echo "rum qemu"

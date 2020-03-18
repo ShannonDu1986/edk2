@@ -42,6 +42,18 @@
   DEFINE NETWORK_HTTP_BOOT_ENABLE       = FALSE
   DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS = TRUE
 
+
+  #
+  # Used to enable/disable capsule update features. The default is FALSE for disabled.
+  # Add -D CAPSULE_ENABLE to the build command line to enable capsule update features.
+  # The build process gerates a capsule update image along with the UEFI application
+  # CapsuleApp.efi. These 2 files must be transferred to storage media to in order for
+  # a user to boot to UEFI shell and use CapsuleApp.efi to submit the signed capsule.
+  # Once the system is rebooted, the signed capsule is authenticated and the firmware is
+  # upated with the new system firmware version
+  #
+  DEFINE CAPSULE_ENABLE = FALSE
+
 !include NetworkPkg/NetworkDefines.dsc.inc
 
   #
@@ -128,7 +140,11 @@
   UefiBootManagerLib|MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
   BootLogoLib|MdeModulePkg/Library/BootLogoLib/BootLogoLib.inf
   FileExplorerLib|MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
+!if $(CAPSULE_ENABLE)
+  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeCapsuleLib.inf
+!else
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
+!endif
   DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
@@ -309,6 +325,9 @@
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
+!if $(CAPSULE_ENABLE)
+  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeRuntimeCapsuleLib.inf
+!endif
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   TimerLib|OvmfPkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
