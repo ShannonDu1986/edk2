@@ -1,0 +1,40 @@
+## @file
+#  System Firmware descriptor.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = SystemFirmwareDescriptor
+  FILE_GUID                      = b2c2180b-1539-488f-b87b-da8fce7b442b
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SystemFirmwareDescriptorPeimEntry
+
+[Sources]
+  SystemFirmwareDescriptorPei.c
+  SystemFirmwareDescriptor.aslc
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  SignedCapsulePkg/SignedCapsulePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  PcdLib
+  PeimEntryPoint
+  PeiServicesLib
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdFdSize
+
+[Pcd]
+  gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiSystemFirmwareImageDescriptor
+
+[Depex]
+  TRUE
