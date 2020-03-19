@@ -8,3 +8,4 @@ tags/
 tags
 *OVMF.fd
 *debug.log
+*.swp
