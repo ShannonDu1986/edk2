@@ -9,3 +9,4 @@ tags
 *OVMF.fd
 *debug.log
 *.swp
+Qemu/Images/disk.img
