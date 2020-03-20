@@ -14,8 +14,13 @@ OvmfPkg/build.sh -a X64 -D DEBUG_ON_SERIAL_PORT -D CAPSULE_ENABLE
 if [[ -f $FVPATH/SYSTEMFIRMWAREUPDATECARGO.Fv ]]; then
 	echo "Copy images and applications to disk.img"
 
-	dd if=/dev/zero of=$DISKIMG obs=512 ibs=512 bs=512 count=16384
-	echo "o
+	if [[ -f $DISKIMG ]]; then
+		echo "$DISKIMG exists"
+	else
+		echo "$DISKIMG doesn't exist"
+		echo "Create $DISKIMG"
+		dd if=/dev/zero of=$DISKIMG obs=512 ibs=512 bs=512 count=16384
+		echo "o
 n
 p
 1
@@ -25,7 +30,9 @@ t
 c
 w" | fdisk $DISKIMG
 
-	mkfs.vfat $DISKIMG
+		mkfs.vfat $DISKIMG
+
+	fi
 
 	mkdir $MNTPNT
 	mount $DISKIMG $MNTPNT
