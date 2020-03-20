@@ -35,6 +35,8 @@
 #include <IndustryStandard/Q35MchIch9.h>
 #include <IndustryStandard/QemuCpuHotplug.h>
 #include <OvmfPlatforms.h>
+#include <Ppi/Capsule.h>
+#include <Library/CapsuleLib.h>
 
 #include "Platform.h"
 #include "Cmos.h"
@@ -57,6 +59,20 @@ EFI_PEI_PPI_DESCRIPTOR   mPpiBootMode[] = {
     &gEfiPeiMasterBootModePpiGuid,
     NULL
   }
+};
+
+EFI_STATUS
+EFIAPI
+PlatformCapsuleCallback (
+  IN  EFI_PEI_SERVICES		**PeiServices,
+  IN  EFI_PEI_NOTIFY_DESCRIPTOR	*NotifyDescriptor,
+  IN  VOID			*ppi
+  );
+
+STATIC EFI_PEI_NOTIFY_DESCRIPTOR mPlatformCapsuleNotify = {
+  (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEfiPeiCapsulePpiGuid,
+  PlatformCapsuleCallback
 };
 
 
@@ -746,6 +762,50 @@ MaxCpuCountInitialization (
   ASSERT_RETURN_ERROR (PcdStatus);
 }
 
+EFI_STATUS
+PlatformCheckCapsuleUpdate (
+  IN EFI_PEI_SERVICES	**PeiServices
+  )
+{
+  EFI_STATUS	Status = EFI_SUCCESS;
+  PEI_CAPSULE_PPI         *Capsule;
+
+  DEBUG ((EFI_D_ERROR, "PlatformCheckCapsuleUpdate enter\n"));
+
+  Status = PeiServicesLocatePpi (
+              &gEfiPeiCapsulePpiGuid,
+              0,
+              NULL,
+              (VOID **) &Capsule
+              );
+
+  DEBUG ((EFI_D_ERROR, "PlatformCheckCapsuleUpdate Status=%r\n", Status));
+  if (!EFI_ERROR(Status)) {
+    Status = Capsule->CheckCapsuleUpdate ((EFI_PEI_SERVICES **)PeiServices);
+    if (!EFI_ERROR(Status)) {
+      Status = PeiServicesSetBootMode (BOOT_ON_FLASH_UPDATE);
+      DEBUG ((EFI_D_ERROR, "PlatformCheckCapsuleUpdate TURE\n"));
+    } else {
+      DEBUG ((EFI_D_ERROR, "PlatformCheckCapsuleUpdate FALSE\n"));
+    }
+  }
+
+  return Status;
+}
+
+
+EFI_STATUS
+EFIAPI
+PlatformCapsuleCallback (
+  IN  EFI_PEI_SERVICES		**PeiServices,
+  IN  EFI_PEI_NOTIFY_DESCRIPTOR	*NotifyDescriptor,
+  IN  VOID			*ppi
+  )
+{
+  PlatformCheckCapsuleUpdate (PeiServices);
+  return EFI_SUCCESS;
+}
+
 
 /**
   Perform Platform PEI initialization.
@@ -781,6 +841,8 @@ InitializePlatform (
   S3Verification ();
   BootModeInitialization ();
   AddressWidthInitialization ();
+
+  Status = (**PeiServices).NotifyPpi (PeiServices, &mPlatformCapsuleNotify);
 
   //
   // Query Host Bridge DID
