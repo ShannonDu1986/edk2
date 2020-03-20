@@ -23,6 +23,7 @@
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   SignedCapsulePkg/SignedCapsulePkg.dec
+  OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   DebugLib
@@ -32,6 +33,8 @@
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFdSize
+
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize
 
 [Pcd]
   gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiSystemFirmwareImageDescriptor

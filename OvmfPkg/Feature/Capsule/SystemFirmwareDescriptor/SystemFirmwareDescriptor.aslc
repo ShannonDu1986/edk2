@@ -41,7 +41,7 @@ IMAGE_DESCRIPTOR mImageDescriptor =
     CURRENT_FIRMWARE_VERSION,                              // Version;
     OFFSET_OF (IMAGE_DESCRIPTOR, VersionNameStr),          // VersionName;
     {0x0},                                                 // Reserved2
-    FixedPcdGet32 (PcdFdSize),                             // Size;
+    FixedPcdGet32 (PcdOvmfFirmwareFdSize),                             // Size;
     IMAGE_ATTRIBUTE_IMAGE_UPDATABLE |
       IMAGE_ATTRIBUTE_RESET_REQUIRED |
       IMAGE_ATTRIBUTE_AUTHENTICATION_REQUIRED |
