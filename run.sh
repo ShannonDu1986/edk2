@@ -36,13 +36,14 @@ w" | fdisk $DISKIMG
 
 	fi
 
+  rm -rf $MNTPNT
 	mkdir $MNTPNT
 	mount $DISKIMG $MNTPNT
 	cp $FVPATH/OVMFFIRMWAREUPDATECAPSULEFMPPKCS7.Cap $MNTPNT
 	cp $CPSPATH $MNTPNT
 	cp $SHLPATH $MNTPNT
 	umount $MNTPNT
-	rmdir $MNTPNT
+	rm -rf $MNTPNT
 	echo "Done"
 fi
 
