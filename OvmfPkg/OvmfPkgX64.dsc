@@ -468,6 +468,9 @@
 !endif
 
 [PcdsFixedAtBuild]
+!if $(CAPSULE_ENABLE)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|TRUE
+!endif
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10
@@ -648,6 +651,9 @@
 !if $(CAPSULE_ENABLE)
   # FMP image descriptor
   OvmfPkg/Feature/Capsule/SystemFirmwareDescriptor/SystemFirmwareDescriptor.inf
+  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
+  MdeModulePkg/Universal/FaultTolerantWritePei/FaultTolerantWritePei.inf
+  MdeModulePkg/Universal/CapsulePei/CapsulePei.inf
 !endif
 
   #
