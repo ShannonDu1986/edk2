@@ -9,6 +9,7 @@ CPSPATH="$APPPATH/CapsuleApp.efi"
 SHLPATH="Qemu/Shell/Shell.efi"
 
 rm -f $FVPATH/OVMF.fd
+rm -f $FVPATH/SYSTEMFIRMWAREUPDATECARGO.Fv
 
 OvmfPkg/build.sh -a X64 -D DEBUG_ON_SERIAL_PORT -D CAPSULE_ENABLE
 
