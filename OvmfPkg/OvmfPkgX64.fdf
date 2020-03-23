@@ -76,42 +76,6 @@ gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase|gUefiOvmfPkgTokenSpaceGuid.
 0x007000|0x001000
 gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress|gUefiOvmfPkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
 
-!if $(CAPSULE_ENABLE)
-0x008000|0x002000
-gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
-
-0x00A000|0x002000
-gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
-
-0x00C000|0x004000
-gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
-DATA = {
-  ## This is the EFI_FIRMWARE_VOLUME_HEADER
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-  # FileSystemGuid: gEfiSystemNvDataFvGuid         =
-  0x8D, 0x2B, 0xF1, 0xFF, 0x96, 0x76, 0x8B, 0x4C,
-  0xA9, 0x85, 0x27, 0x47, 0x07, 0x5B, 0x4F, 0x50,
-  # FvLength: 0x20000
-  0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
-  #Signature "_FVH"       #Attributes
-  0x5f, 0x46, 0x56, 0x48, 0xff, 0xfe, 0x04, 0x00,
-  #HeaderLength #CheckSum #ExtHeaderOffset #Reserved #Revision
-  0x48, 0x00, 0x36, 0x09, 0x00, 0x00, 0x00, 0x02,
-  #Blockmap[0]: 2 Blocks * 0x10000 Bytes / Block
-  0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00,
-  #Blockmap[1]: End
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-  ## This is the VARIABLE_STORE_HEADER gEfiVariableGuid
-  0x16, 0x36, 0xcf, 0xdd, 0x75, 0x32, 0x64, 0x41,
-  0x98, 0xb6, 0xfe, 0x85, 0x70, 0x7f, 0xfe, 0x7d,
-  #Size: 0x4000 (gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize) - 0x48 (size of EFI_FIRMWARE_VOLUME_HEADER) = 0xdFB8
-  0xB8, 0x3F, 0x00, 0x00,
-  #FORMATTED: 0x5A #HEALTHY: 0xFE #Reserved: UINT16 #Reserved1: UINT32
-  0x5A, 0xFE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-}
-!endif
-
 0x010000|0x010000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
 
@@ -496,7 +460,7 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
 FILE RAW = 26961C31-66DC-48A5-891C-25438BDE1430 { # PcdEdkiiSystemFirmwareFileGuid
-    FD = OVMF
+    FD = OVMF.fd
   }
 
 FILE RAW = ce57b167-b0e4-41e8-a897-5f4feb781d40 { # gEdkiiSystemFmpCapsuleDriverFvFileGuid
@@ -550,6 +514,15 @@ FMP_PAYLOAD = FmpPayloadSystemFirmwarePkcs7
   FILE PEIM = $(NAMED_GUID) {
      PEI_DEPEX PEI_DEPEX Optional        $(INF_OUTPUT)/$(MODULE_NAME).depex
      PE32      PE32   Align=Auto         $(INF_OUTPUT)/$(MODULE_NAME).efi
+     UI       STRING="$(MODULE_NAME)" Optional
+     VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+ 
+[Rule.Common.PEIM.FMP_IMAGE_DESC]
+  FILE PEIM = $(NAMED_GUID) {
+     RAW BIN                  |.acpi
+     PEI_DEPEX PEI_DEPEX Optional        $(INF_OUTPUT)/$(MODULE_NAME).depex
+     PE32      PE32    Align=4K          $(INF_OUTPUT)/$(MODULE_NAME).efi
      UI       STRING="$(MODULE_NAME)" Optional
      VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
@@ -638,13 +611,4 @@ FMP_PAYLOAD = FmpPayloadSystemFirmwarePkcs7
     PE32     PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
     UI       STRING="$(MODULE_NAME)" Optional
     VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
-  }
- 
-[Rule.Common.PEIM.FMP_IMAGE_DESC]
-  FILE PEIM = $(NAMED_GUID) {
-     RAW BIN                  |.acpi
-     PEI_DEPEX PEI_DEPEX Optional        $(INF_OUTPUT)/$(MODULE_NAME).depex
-     PE32      PE32    Align=4K          $(INF_OUTPUT)/$(MODULE_NAME).efi
-     UI       STRING="$(MODULE_NAME)" Optional
-     VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
