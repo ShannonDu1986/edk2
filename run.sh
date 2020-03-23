@@ -11,7 +11,7 @@ SHLPATH="Qemu/Shell/Shell.efi"
 rm -f $FVPATH/OVMF.fd
 rm -f $FVPATH/SYSTEMFIRMWAREUPDATECARGO.Fv
 
-OvmfPkg/build.sh -a X64 -D DEBUG_ON_SERIAL_PORT -D CAPSULE_ENABLE
+OvmfPkg/build.sh -a X64 -D DEBUG_ON_SERIAL_PORT -D CAPSULE_ENABLE -D SMM_REQUIRE
 
 if [[ -f $FVPATH/SYSTEMFIRMWAREUPDATECARGO.Fv ]]; then
 	echo "Copy images and applications to disk.img"
@@ -50,7 +50,12 @@ fi
 if [[ -f Build/OvmfX64/DEBUG_GCC5/FV/OVMF.fd ]]; then
 	echo "rum qemu"
 	cp $FVPATH/OVMF.fd Qemu/BIOS/
-	qemu-system-x86_64 -bios Qemu/BIOS/OVMF.fd -serial file:$LOGFILE -machine q35 -hda $DISKIMG
+	# qemu-system-x86_64 -bios Qemu/BIOS/OVMF.fd -serial file:$LOGFILE -machine q35 -hda $DISKIMG
+	qemu-system-x86_64 -drive file=Qemu/BIOS/OVMF.fd,format=raw,if=pflash \
+                     -global ICH9-LPC.disable_s3=1 \
+                     -serial file:$LOGFILE \
+                     -machine q35 \
+                     -hda $DISKIMG
 fi
 
 echo "Please find the BIOS log at Qemu/Log/debug.log"
