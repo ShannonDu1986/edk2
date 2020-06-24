@@ -1025,3 +1025,4 @@
   }
 !endif
 
+ OvmfPkg/AmdManageabilityRecovery/AmdCpmManageabilityRecoveryDxe.inf

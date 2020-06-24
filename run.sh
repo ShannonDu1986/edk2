@@ -8,10 +8,19 @@ MNTPNT="/mnt/disk_image"
 CPSPATH="$APPPATH/CapsuleApp.efi"
 SHLPATH="Qemu/Shell/Shell.efi"
 
+MANOS="manOS"
+MANOS_SRC_PATH="Qemu/ManOS"
+MANOS_DST_PATH="$MNTPNT/EFI/AMD"
+
 rm -f $FVPATH/OVMF.fd
 rm -f $FVPATH/SYSTEMFIRMWAREUPDATECARGO.Fv
 
 OvmfPkg/build.sh -a X64 -D DEBUG_ON_SERIAL_PORT -D CAPSULE_ENABLE -D SMM_REQUIRE
+
+if [[ ! -f $FVPATH/OVMF.fd ]]; then
+  echo "Build error"
+  exit
+fi
 
 if [[ -f $FVPATH/SYSTEMFIRMWAREUPDATECARGO.Fv ]]; then
 	echo "Copy images and applications to disk.img"
@@ -21,7 +30,7 @@ if [[ -f $FVPATH/SYSTEMFIRMWAREUPDATECARGO.Fv ]]; then
 	else
 		echo "$DISKIMG doesn't exist"
 		echo "Create $DISKIMG"
-		dd if=/dev/zero of=$DISKIMG obs=512 ibs=512 bs=512 count=16384
+		dd if=/dev/zero of=$DISKIMG obs=512 ibs=512 bs=512 count=65536
 		echo "o
 n
 p
@@ -42,6 +51,12 @@ w" | fdisk $DISKIMG
 	cp $FVPATH/OVMFFIRMWAREUPDATECAPSULEFMPPKCS7.Cap $MNTPNT
 	cp $CPSPATH $MNTPNT
 	cp $SHLPATH $MNTPNT
+  if [[ -f $MANOS_SRC_PATH/$MANOS ]]; then
+    if [[ ! -d $MANOS_DST_PATH ]]; then
+      mkdir -p $MANOS_DST_PATH
+    fi
+    cp $MANOS_SRC_PATH/$MANOS $MANOS_DST_PATH
+  fi
 	umount $MNTPNT
 	rm -rf $MNTPNT
 	echo "Done"
@@ -57,6 +72,8 @@ if [[ -f Build/OvmfX64/DEBUG_GCC5/FV/OVMF.fd ]]; then
                      -machine q35 \
                      -hda $DISKIMG
 fi
+
+find $FVPATH | xargs chown shannon
 
 echo "Please find the BIOS log at Qemu/Log/debug.log"
 cp $LOGFILE ./
