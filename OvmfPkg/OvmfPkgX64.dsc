@@ -37,6 +37,7 @@
   #
   # Network definition
   #
+  DEFINE NETWORK_ENABLE                 = FALSE
   DEFINE NETWORK_TLS_ENABLE             = FALSE
   DEFINE NETWORK_IP6_ENABLE             = FALSE
   DEFINE NETWORK_HTTP_BOOT_ENABLE       = FALSE
@@ -652,7 +653,7 @@
   # FMP image descriptor
   OvmfPkg/Feature/Capsule/SystemFirmwareDescriptor/SystemFirmwareDescriptor.inf
   MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
-  MdeModulePkg/Universal/FaultTolerantWritePei/FaultTolerantWritePei.inf
+  # MdeModulePkg/Universal/FaultTolerantWritePei/FaultTolerantWritePei.inf
   MdeModulePkg/Universal/CapsulePei/CapsulePei.inf
 !endif
 

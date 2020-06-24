@@ -154,7 +154,7 @@ INF  MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei
   # FMP image descriptor
   INF RuleOverride = FMP_IMAGE_DESC OvmfPkg/Feature/Capsule/SystemFirmwareDescriptor/SystemFirmwareDescriptor.inf
   INF MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
-  INF MdeModulePkg/Universal/FaultTolerantWritePei/FaultTolerantWritePei.inf
+  # INF MdeModulePkg/Universal/FaultTolerantWritePei/FaultTolerantWritePei.inf
   INF  MdeModulePkg/Universal/CapsulePei/CapsulePei.inf
 !endif
 INF  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
@@ -460,7 +460,7 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
 FILE RAW = 26961C31-66DC-48A5-891C-25438BDE1430 { # PcdEdkiiSystemFirmwareFileGuid
-    FD = OVMF.fd
+    FD = OVMF
   }
 
 FILE RAW = ce57b167-b0e4-41e8-a897-5f4feb781d40 { # gEdkiiSystemFmpCapsuleDriverFvFileGuid
