@@ -340,11 +340,43 @@ SaveManOSImageAsBackup (
 }
 
 VOID
+EFIAPI
+CreateVariable (
+  IN EFI_EVENT    Event,
+  IN VOID         *Context
+  )
+{
+  EFI_STATUS            Status;
+  MANOS_RECOVERY_CONFIG Config;
+
+  Config.CurVersion = 0;
+  Config.TargetVersion = 0;
+  Config.ImageAddress = 0x0ul;
+  Config.NeedRecovery = 0;
+  Config.ImageReadyInMem = 0;
+  Config.VarInitialized = 1;
+
+  Status = gRT->SetVariable (
+                  AMD_MANOS_RECOVERY_CONFIG_NAME,
+                  &gAmdManOSRecoveryConfigGuid,
+                  EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                  sizeof(MANOS_RECOVERY_CONFIG),
+                  (VOID *) &Config
+        );
+  if (EFI_ERROR(Status)) {
+    DEBUG ((EFI_D_ERROR, "Initialized the variable failed, Status = %r\n", Status));
+  } else {
+    DEBUG ((EFI_D_ERROR, "Initialized the variable successfully, Status = %r\n", Status));
+  }
+}
+
+VOID
 InitManRecoveryConfigVariable ()
 {
   EFI_STATUS            Status;
   MANOS_RECOVERY_CONFIG Config;
   UINTN                 Size;
+  VOID                  *Registration;
 
   Size = sizeof (MANOS_RECOVERY_CONFIG);
   Status = gRT->GetVariable (
@@ -358,28 +390,19 @@ InitManRecoveryConfigVariable ()
   if (EFI_ERROR(Status)) {
     DEBUG ((EFI_D_ERROR, "Variable is not available, Status=%r\n", Status));
 
-    Config.CurVersion = 0;
-    Config.TargetVersion = 0;
-    Config.ImageAddress = 0x0ul;
-    Config.NeedRecovery = 0;
-    Config.ImageReadyInMem = 0;
-    Config.VarInitialized = 1;
-
-    Status = gRT->SetVariable (
-                  mVariableName,
-                  &gAmdManOSRecoveryConfigGuid,
-                  EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                  sizeof(MANOS_RECOVERY_CONFIG),
-                  (VOID *) &Config
+    if (Status == EFI_NOT_FOUND) {
+      // the variable is not created, so register callback to create the variable
+      EfiCreateProtocolNotifyEvent (
+        &gEfiVariableWriteArchProtocolGuid,
+        TPL_NOTIFY,
+        CreateVariable,
+        NULL,
+        &Registration
         );
-    if (EFI_ERROR(Status)) {
-      DEBUG ((EFI_D_ERROR, "Initialized the variable failed, Status = %r\n", Status));
-    } else {
-      DEBUG ((EFI_D_ERROR, "Initialized the variable successfully, Status = %r\n", Status));
     }
-
-//  deadloop();
-
+  } else {
+    DEBUG ((EFI_D_ERROR, "Variable is available, Config.VarInitialized=%d\n", Config.VarInitialized));
+  }
 }
 
 VOID
@@ -417,6 +440,7 @@ PrepareManOSRecovery (
   Status = LoadManOSBackUpImage(FileBuffer, &FileBufferSize, MAN_OS_RECOVERY_BACKUP_FILE_NAME, TRUE);
   DEBUG ((EFI_D_ERROR, "PrepareManOSRecovery : FileBufferSize=%d, Status=%r\n", FileBufferSize, Status));
   DumpMemory(FileBuffer, 0x300);
+
   return;
 }
 

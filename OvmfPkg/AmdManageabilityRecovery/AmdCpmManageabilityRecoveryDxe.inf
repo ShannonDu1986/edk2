@@ -82,6 +82,7 @@
   gEfiComponentName2ProtocolGuid
   gEfiLoadedImageDevicePathProtocolGuid
   gEfiSimpleFileSystemProtocolGuid
+  gEfiVariableWriteArchProtocolGuid
 
 [Ppis]
 
