@@ -7,23 +7,23 @@ LOGFILE="Qemu/Log/debug.log"
 MNTPNT="/mnt/disk_image"
 CPSPATH="$APPPATH/CapsuleApp.efi"
 SHLPATH="Qemu/Shell/Shell.efi"
+BIOSIMG="$FVPATH/OVMF.fd"
 
 MANOS="manOS"
 MANOS_SRC_PATH="Qemu/ManOS"
 MANOS_DST_PATH="$MNTPNT/EFI/AMD"
 
-rm -f $FVPATH/OVMF.fd
+rm -f $BIOSIMG
 rm -f $FVPATH/SYSTEMFIRMWAREUPDATECARGO.Fv
 
 #OvmfPkg/build.sh -a X64 -D DEBUG_ON_SERIAL_PORT -D CAPSULE_ENABLE -D SMM_REQUIRE
 OvmfPkg/build.sh -a X64 -D DEBUG_ON_SERIAL_PORT 
 
-if [[ ! -f $FVPATH/OVMF.fd ]]; then
+if [[ ! -f $BIOSIMG ]]; then
   echo "Build error"
   exit
-fi
+else
 
-if [[ -f $FVPATH/SYSTEMFIRMWAREUPDATECARGO.Fv ]]; then
 	echo "Copy images and applications to disk.img"
 
 	if [[ -f $DISKIMG ]]; then
@@ -49,9 +49,15 @@ w" | fdisk $DISKIMG
   rm -rf $MNTPNT
 	mkdir $MNTPNT
 	mount $DISKIMG $MNTPNT
-	cp $FVPATH/OVMFFIRMWAREUPDATECAPSULEFMPPKCS7.Cap $MNTPNT
-	cp $CPSPATH $MNTPNT
-	cp $SHLPATH $MNTPNT
+  if [[ -f $FVPATH/OVMFFIRMWAREUPDATECAPSULEFMPPKCS7.Cap ]]; then
+	  cp $FVPATH/OVMFFIRMWAREUPDATECAPSULEFMPPKCS7.Cap $MNTPNT
+  fi
+  if [[ -f $CPSPATH ]]; then
+	  cp $CPSPATH $MNTPNT
+  fi
+  if [[ -f $SHLPATH ]]; then
+	  cp $SHLPATH $MNTPNT
+  fi
   if [[ -f $MANOS_SRC_PATH/$MANOS ]]; then
     if [[ ! -d $MANOS_DST_PATH ]]; then
       mkdir -p $MANOS_DST_PATH
@@ -61,9 +67,7 @@ w" | fdisk $DISKIMG
 	umount $MNTPNT
 	rm -rf $MNTPNT
 	echo "Done"
-fi
 
-if [[ -f Build/OvmfX64/DEBUG_GCC5/FV/OVMF.fd ]]; then
 	echo "rum qemu"
 	cp $FVPATH/OVMF.fd Qemu/BIOS/
 	# qemu-system-x86_64 -bios Qemu/BIOS/OVMF.fd -serial file:$LOGFILE -machine q35 -hda $DISKIMG
