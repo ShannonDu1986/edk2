@@ -97,6 +97,16 @@ VOID deadloop();
 // Function definitions
 //
 
+EFI_STATUS
+GetManOSRecoveryConfig (
+  IN OUT MANOS_RECOVERY_CONFIG *Config
+);
+
+EFI_STATUS
+SetManOSRecoveryConfig (
+  IN MANOS_RECOVERY_CONFIG Config
+);
+
 BOOLEAN
 IsManOSBackUpImageAvailable (
 );
@@ -337,6 +347,48 @@ SaveManOSImageAsBackup (
     return EFI_INVALID_PARAMETER;
   }
   return EFI_SUCCESS;
+}
+
+
+EFI_STATUS
+GetManOSRecoveryConfig (
+  IN OUT MANOS_RECOVERY_CONFIG *Config
+)
+{
+  EFI_STATUS            Status;
+  UINTN                 Size;
+
+  Size = sizeof (MANOS_RECOVERY_CONFIG);
+  Status = gRT->GetVariable (
+                  AMD_MANOS_RECOVERY_CONFIG_NAME,
+                  &gAmdManOSRecoveryConfigGuid,
+                  NULL,
+                  &Size,
+                  (VOID *) Config
+      );
+  if (EFI_ERROR(Status)) {
+    DEBUG ((EFI_D_ERROR, "GetManOSRecoveryConfig failed, Status = %r\n", Status));
+  }
+  return Status;
+}
+
+EFI_STATUS
+SetManOSRecoveryConfig (
+  IN MANOS_RECOVERY_CONFIG Config
+)
+{
+  EFI_STATUS            Status;
+  Status = gRT->SetVariable (
+                  AMD_MANOS_RECOVERY_CONFIG_NAME,
+                  &gAmdManOSRecoveryConfigGuid,
+                  EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                  sizeof(MANOS_RECOVERY_CONFIG),
+                  (VOID *) &Config
+        );
+  if (EFI_ERROR(Status)) {
+    DEBUG ((EFI_D_ERROR, "SetManOSRecoveryConfig failed, Status = %r\n", Status));
+  }
+  return Status;
 }
 
 VOID
