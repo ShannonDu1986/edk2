@@ -539,12 +539,9 @@ AmdCpmManageabilityDxeRecoveryEntry (
     }
   }
 
-
-  DEBUG((EFI_D_ERROR, "AmdCpmManageabilityDxeRecoveryEntry - 1\n"));
   if (IsImageReadyInMem()) {
     Status = ProcessManOSRecovery();
   }
-  DEBUG((EFI_D_ERROR, "AmdCpmManageabilityDxeRecoveryEntry - 2\n"));
 
   if (IsManOSRecoveryRequired()) {
     EfiCreateProtocolNotifyEvent (
@@ -555,7 +552,6 @@ AmdCpmManageabilityDxeRecoveryEntry (
         &Registration
         );
   }
-  DEBUG((EFI_D_ERROR, "AmdCpmManageabilityDxeRecoveryEntry - 3\n"));
 
   DEBUG((EFI_D_ERROR, "AmdCpmManageabilityDxeRecoveryEntry - exit, Status = %r\n", Status));
   return Status;
