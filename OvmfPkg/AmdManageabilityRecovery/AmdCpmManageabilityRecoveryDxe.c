@@ -265,7 +265,17 @@ BOOLEAN
 IsImageReadyInMem (
 )
 {
-  return FALSE;
+  EFI_STATUS    Status;
+  MANOS_RECOVERY_CONFIG Config;
+
+  Status = GetManOSRecoveryConfig (&Config);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "IsImageReadyInMem: Get config failed, Status = %r\n", Status));
+    return FALSE;
+  }
+
+  DEBUG ((EFI_D_ERROR, "IsImageReadyInMem: Config.ImageReadyInMem = %d\n", Config.ImageReadyInMem));
+  return Config.ImageReadyInMem == 1 ? TRUE : FALSE;
 }
 
 BOOLEAN
