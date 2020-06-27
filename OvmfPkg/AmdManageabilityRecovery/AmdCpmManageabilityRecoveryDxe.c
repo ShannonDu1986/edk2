@@ -479,6 +479,7 @@ PrepareManOSRecovery (
   UINTN         FileBufferSize;
   UINTN         Pages;
   EFI_PHYSICAL_ADDRESS Address;
+  MANOS_RECOVERY_CONFIG Config;
 
   DEBUG ((EFI_D_ERROR, "PrepareManOSRecovery :enter  Status=%r\n", Status));
 
@@ -495,13 +496,22 @@ PrepareManOSRecovery (
   FileBuffer = (UINT8 *) (UINTN) Address;
   ZeroMem (FileBuffer, FileBufferSize);
 
-
-  //FileBuffer = (UINT8 *)AllocateZeroPool(FileBufferSize);
-  DumpMemory(FileBuffer, 0x300);
   DEBUG ((EFI_D_ERROR, "PrepareManOSRecovery : FileBuffer=%p\n", FileBuffer));
   Status = LoadManOSBackUpImage(FileBuffer, &FileBufferSize, MAN_OS_RECOVERY_BACKUP_FILE_NAME, TRUE);
   DEBUG ((EFI_D_ERROR, "PrepareManOSRecovery : FileBufferSize=%d, Status=%r\n", FileBufferSize, Status));
   DumpMemory(FileBuffer, 0x300);
+
+  Status = GetManOSRecoveryConfig(&Config);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "PrepareManOSRecovery: Failed to get config, Status = %r\n", Status));
+    return;
+  }
+  Config.ImageReadyInMem = 1;
+  Config.ImageAddress = Address;
+  Status = SetManOSRecoveryConfig(Config);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "PrepareManOSRecovery: Failed to set config, Status = %r\n", Status));
+  }
 
   return;
 }
@@ -512,7 +522,20 @@ EFI_STATUS
 ProcessManOSRecovery (
 )
 {
-  return EFI_SUCCESS;
+  EFI_STATUS    Status = EFI_SUCCESS;
+  MANOS_RECOVERY_CONFIG Config;
+  UINT64        Address;
+
+  Status = GetManOSRecoveryConfig(&Config);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "ProcessManOSRecovery: Failed to get config, Status = %r\n", Status));
+  }
+  if (Config.ImageReadyInMem) {
+    Address = Config.ImageAddress;
+    DEBUG ((EFI_D_ERROR, "ProcessManOSRecovery: Image is located at 0x%llx \n", Address));
+    DumpMemory((VOID *)Address, 0x300);
+  }
+  return Status;
 }
 
 
@@ -541,6 +564,7 @@ AmdCpmManageabilityDxeRecoveryEntry (
 
   if (IsImageReadyInMem()) {
     Status = ProcessManOSRecovery();
+    return Status;
   }
 
   if (IsManOSRecoveryRequired()) {
