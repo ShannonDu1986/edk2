@@ -201,14 +201,18 @@ IsUsbDevicePath(
 {
   BOOLEAN       Result = FALSE;
 
+  DEBUG ((EFI_D_ERROR, "IsUsbDevicePath enter\n"));
+
   if (DevicePath != NULL)
   {
     while (!IsDevicePathEnd (DevicePath) && !Result)
     {
+      DEBUG ((EFI_D_ERROR, "DeviceNode=%s\n", ConvertDeviceNodeToText(DevicePath, FALSE, FALSE)));
       Result = (DevicePathType (DevicePath) == MESSAGING_DEVICE_PATH && DevicePathSubType (DevicePath) == MSG_USB_DP);
       DevicePath = NextDevicePathNode (DevicePath);
     }
   }
+  DEBUG ((EFI_D_ERROR, "IsUsbDevicePath exit\n"));
   return Result;
 }
 
@@ -285,6 +289,25 @@ IsManOSRecoveryRequired (
   return TRUE;
 }
 
+VOID
+PrintDevicePath (
+  EFI_HANDLE  *Handle
+)
+{
+  EFI_STATUS                Status = EFI_NOT_STARTED;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath = NULL;
+
+  if (Handle != NULL)
+  {
+    Status = gBS->HandleProtocol(Handle, &gEfiDevicePathProtocolGuid, (VOID**)&DevicePath);
+    if (Status == EFI_SUCCESS)
+    {
+      DEBUG ((EFI_D_ERROR, "\n%a: DevicePath=%s\n", __FUNCTION__, ConvertDevicePathToText(DevicePath, FALSE, FALSE)));
+    }
+  }
+  return;
+}
+
 EFI_STATUS
 LoadManOSBackUpImage (
   IN OUT UINT8      *FileBuffer,
@@ -316,6 +339,7 @@ LoadManOSBackUpImage (
 
   DEBUG ((EFI_D_ERROR, "LoadManOSBackUpImage: HandleCount=%d\n", HandleCount));
   for (Index = 0; (Index < HandleCount) && !FoundFile; Index++) {
+    PrintDevicePath(HandleBuffer[Index]);
     if (!SearchUsb) {
       if (IsUsbDeviceType(HandleBuffer[Index])) {
         continue;
@@ -497,7 +521,7 @@ PrepareManOSRecovery (
   ZeroMem (FileBuffer, FileBufferSize);
 
   DEBUG ((EFI_D_ERROR, "PrepareManOSRecovery : FileBuffer=%p\n", FileBuffer));
-  Status = LoadManOSBackUpImage(FileBuffer, &FileBufferSize, MAN_OS_RECOVERY_BACKUP_FILE_NAME, TRUE);
+  Status = LoadManOSBackUpImage(FileBuffer, &FileBufferSize, MAN_OS_RECOVERY_BACKUP_FILE_NAME, FALSE);
   DEBUG ((EFI_D_ERROR, "PrepareManOSRecovery : FileBufferSize=%d, Status=%r\n", FileBufferSize, Status));
   DumpMemory(FileBuffer, 0x300);
 
@@ -537,7 +561,6 @@ ProcessManOSRecovery (
   }
   return Status;
 }
-
 
 EFI_STATUS
 EFIAPI
