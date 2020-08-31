@@ -13,6 +13,8 @@ MANOS="manOS"
 MANOS_SRC_PATH="Qemu/ManOS"
 MANOS_DST_PATH="$MNTPNT/EFI/AMD"
 
+start_time=`date +%s%N`
+
 rm -f $BIOSIMG
 rm -f $FVPATH/SYSTEMFIRMWAREUPDATECARGO.Fv
 
@@ -82,3 +84,8 @@ find $FVPATH | xargs chown shannon
 
 echo "Please find the BIOS log at Qemu/Log/debug.log"
 cp $LOGFILE ./
+
+end_time=`date +%s%N`
+time_used=`echo $end_time $start_time | awk '{print($1 - $2)/1000000000}'`
+
+echo "Total time used: $time_used seconds"
