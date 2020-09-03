@@ -122,6 +122,45 @@ AsfPushMessage (
 }
 
 EFI_STATUS
+AsfGetBootOption ()
+{
+  EFI_STATUS          Status = EFI_SUCCESS;
+  ASF_BOOT_OPTION     BootOption;
+
+  SetMem(&BootOption, sizeof(ASF_BOOT_OPTION), 0x00);
+
+  // Call MPM Interface to get boot option
+
+  if (EFI_ERROR(Status)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  if (BootOption.SubCommand == ASFMSG_SUBCMD_RET_BOOT_OPTION) {
+    CopyMem(&mAsfBootOption, &BootOption, sizeof(ASF_BOOT_OPTION));
+
+    AsfPushMessage((UINT8 *)&mAsfMsgClearBootOption.Message.BootOption,
+                    mAsfMsgClearBootOption.Message.BootOption.Length + 2,
+                    mAsfMsgClearBootOption.MessageString);
+
+  }
+
+  return Status;
+}
+
+VOID
+AsfConfigurationDataReset()
+{
+  // UINTN         Length;
+  // UINT32        Attribute;
+  // EFI_STATUS    Status;
+
+  if (mAsfBootOption.BootOptionBit[0] & ASF_BOP_BIT_CONFIGURATION_DATA_RESET) {
+    // reset setup data
+    ;
+  }
+}
+
+EFI_STATUS
 EFIAPI
 AsfDxeEntry (
   IN EFI_HANDLE       ImageHandle,
@@ -137,8 +176,10 @@ AsfDxeEntry (
   // Check MPM Enable
 
   // ASF Get Boot Option
+  AsfGetBootOption();
 
   // Configuration Data Reset if needed
+  AsfConfigurationDataReset();
 
   // Lock lock keyboard if needed
 

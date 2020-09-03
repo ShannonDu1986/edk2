@@ -86,7 +86,8 @@ typedef enum {
   MsgSystemStateS5,
   MsgStartBiosWatchdogTimer,
   MsgStartOsWatchdogTimer,
-  MsgStopWatchdogtimer
+  MsgStopWatchdogtimer,
+  MsgClearBootOption
 } ASF_MESSAGE_TYPE;
 
 #pragma pack (1)
@@ -96,13 +97,16 @@ typedef enum {
 **/
 typedef struct _ASF_BOOT_OPTION
 {
+  UINT8       Command;
+  UINT8       Length;
 	UINT8       SubCommand;
 	UINT8       VersionNumber;
-	UINT32      IANAId;
+	UINT8       IANAId[4];
 	UINT8       SpecialCmd;
-	UINT16      SpecCmdParam;
-	UINT16      BootOptionBit;
-	UINT16      OEMParam;
+	UINT8       SpecCmdParamHighByte;
+  UINT8       SpecCmdParamLowByte;
+	UINT8       BootOptionBit[2];
+	UINT8       OEMParam[2];
 } ASF_BOOT_OPTION;
 
 typedef struct _ASF_MSG_NORETRANSMIT {
