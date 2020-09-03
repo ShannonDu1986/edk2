@@ -172,6 +172,8 @@ INF  SecurityPkg/Tcg/TcgPei/TcgPei.inf
 INF  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
 !endif
 
+INF OvmfPkg/Asf/AsfPei/AsfPei.inf
+
 ################################################################################
 
 [FV.DXEFV]
@@ -386,6 +388,7 @@ INF  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
 
 
 INF OvmfPkg/AmdManageabilityRecovery/AmdCpmManageabilityRecoveryDxe.inf
+INF OvmfPkg/Asf/AsfDxe/AsfDxe.inf
 
 ################################################################################
 

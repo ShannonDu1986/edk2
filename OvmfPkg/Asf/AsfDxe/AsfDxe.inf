@@ -1,0 +1,33 @@
+[Defines]
+  INF_VERSION             = 0x00010005
+  VERSION_STRING          = 1.0
+  BASE_NAME               = AsfDxe
+  MODULE_TYPE             = DXE_DRIVER
+  FILE_GUID               = 06ecaf57-1a95-44dd-ae09-ab9b9bd681e9
+  ENTRY_POINT             = AsfDxeEntry
+
+[Sources]
+  AsfDxe.c
+  AsfDxe.h
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  DebugLib
+  HobLib
+  BaseMemoryLib
+
+[Protocols]
+  # gEfiDataHubProtocolGuid
+  gEfiRscHandlerProtocolGuid
+
+[Guids]
+  gEfiGlobalVariableGuid
+  gEfiHobListGuid
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Depex]
+  TRUE
