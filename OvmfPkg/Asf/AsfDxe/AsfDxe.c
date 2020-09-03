@@ -68,7 +68,6 @@ AsfReadyToBootCallBack (
 )
 {
   DEBUG ((DEBUG_INFO, "%a\n", __FUNCTION__));
-
   // ASF boot override
 
   // Create ASF SMBIOS Structure Type 129

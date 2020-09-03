@@ -182,6 +182,7 @@ typedef struct {
   EFI_STATUS_CODE_VALUE       StatusCode;
 } MESSAGE_DATA_HUB_MAP;
 
+
 #pragma pack ()
 
 #pragma pack (2)
