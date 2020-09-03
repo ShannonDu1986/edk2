@@ -1,0 +1,29 @@
+[Defines]
+  INF_VERSION             = 0x00010005
+  VERSION_STRING          = 1.0
+  BASE_NAME               = AsfPei
+  MODULE_TYPE             = PEIM
+  FILE_GUID               = 7604b120-a55c-4a36-a9f6-420e5ada995c
+  ENTRY_POINT             = AsfPeiEntry
+  PEI_SPECIFICATION_VERSION = 0x0001000A
+
+  [Sources]
+    AsfPei.c
+  
+  [LibraryClasses]
+    PeimEntryPoint
+    PeiServicesLib
+    DebugLib
+  
+  [Ppis]
+    gEfiPeiRscHandlerPpiGuid
+    gEfiPeiMemoryDiscoveredPpiGuid
+  
+  [Packages]
+    MdePkg/MdePkg.dec
+    MdeModulePkg/MdeModulePkg.dec
+  
+  [Depex]
+    TRUE
+    #should be depend on AGESE_MPM readiness
+    #gAmdMpmDataInitializedPpiGuid

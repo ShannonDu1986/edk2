@@ -701,6 +701,8 @@
   }
 !endif
 
+  OvmfPkg/Asf/AsfPei/AsfPei.inf
+
   #
   # DXE Phase modules
   #
@@ -1026,3 +1028,4 @@
 !endif
 
  OvmfPkg/AmdManageabilityRecovery/AmdCpmManageabilityRecoveryDxe.inf
+ OvmfPkg/Asf/AsfDxe/AsfDxe.inf
