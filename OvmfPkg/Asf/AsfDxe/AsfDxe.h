@@ -12,6 +12,7 @@
 #include <Library/UefiLib.h>
 #include <Library/HobLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/DevicePathLib.h>
 #include <Guid/GlobalVariable.h>
 #include <Uefi/UefiBaseType.h>
 #include <Uefi/UefiSpec.h>

@@ -20,6 +20,8 @@
 [Protocols]
   # gEfiDataHubProtocolGuid
   gEfiRscHandlerProtocolGuid
+  gEfiSimpleTextInProtocolGuid
+  gEfiSimpleTextInputExProtocolGuid
 
 [Guids]
   gEfiGlobalVariableGuid

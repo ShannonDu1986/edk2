@@ -160,6 +160,148 @@ AsfConfigurationDataReset()
   }
 }
 
+VOID
+EFIAPI
+LegacyBiosLockLocalKeyboard ()
+{
+#if (defined(CSM_SUPPORT) && (CSM_SUPPORT != 0))
+#endif
+}
+
+BOOLEAN
+IsUsbDevice (
+  IN EFI_DEVICE_PATH_PROTOCOL *Node
+)
+{
+  if(Node != NULL) {
+    if ((Node->Type == MESSAGING_DEVICE_PATH) && \
+        (Node->SubType == MSG_USB_DP)) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+BOOLEAN
+IsGenericSioDevicePath (
+  IN EFI_DEVICE_PATH_PROTOCOL *Node
+)
+{
+  // TODO:
+
+  return FALSE;
+}
+
+VOID
+EFIAPI
+EventConInStartedCallback (
+  IN EFI_EVENT    Event,
+  IN VOID         *Context
+)
+{
+  EFI_STATUS                        Status;
+  EFI_HANDLE                        *SimpleTextInHandle;
+  UINTN                             NumberOfHandle;
+  UINTN                             Index;
+  EFI_DEVICE_PATH_PROTOCOL          *DevicePathNode;
+  EFI_DEVICE_PATH_PROTOCOL          *DevicePath;
+  EFI_SIMPLE_TEXT_INPUT_PROTOCOL    *SimpleTextIn;
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *SimpleTextInEx;
+
+  // Hook IN 9h for locking local keyboard
+  LegacyBiosLockLocalKeyboard();
+
+  // Uninstall all the console spliter drivers except SOL
+  Status = gBS->LocateHandleBuffer ( ByProtocol,
+                                    &gEfiSimpleTextInProtocolGuid,
+                                    NULL,
+                                    &NumberOfHandle,
+                                    &SimpleTextInHandle
+                                    );
+  if (EFI_ERROR(Status)) {
+    return;
+  }
+
+  for (Index = 0; Index < NumberOfHandle; Index++) {
+    Status = gBS->HandleProtocol (SimpleTextInHandle[Index],
+                                  &gEfiDevicePathProtocolGuid,
+                                  (VOID *)&DevicePath
+                                  );
+    if (EFI_ERROR(Status)) {
+      return;
+    }
+
+    DevicePathNode = DevicePath;
+    while (!IsDevicePathEndType(DevicePathNode)) {
+      // Is USB device path or gereric SIO device path (SouthBridge)
+      if (IsUsbDevice(DevicePathNode) || IsGenericSioDevicePath(DevicePathNode)) {
+        Status = gBS->HandleProtocol (
+                            SimpleTextInHandle[Index],
+                            &gEfiSimpleTextInProtocolGuid,
+                            (VOID **)&SimpleTextIn
+                            );
+        if (EFI_ERROR(Status)) {
+          break;
+        }
+        Status = gBS->UninstallProtocolInterface (
+                            SimpleTextInHandle[Index],
+                            &gEfiSimpleTextInProtocolGuid,
+                            SimpleTextIn
+                            );
+        if (EFI_ERROR(Status)) {
+          break;
+        }
+
+        Status = gBS->HandleProtocol (
+                            SimpleTextInHandle[Index],
+                            &gEfiSimpleTextInputExProtocolGuid,
+                            (VOID **)&SimpleTextInEx
+                            );
+        if (EFI_ERROR(Status)) {
+          break;
+        }
+        Status = gBS->UninstallProtocolInterface (
+                            SimpleTextInHandle[Index],
+                            &gEfiSimpleTextInputExProtocolGuid,
+                            SimpleTextInEx
+                            );
+        if (EFI_ERROR(Status)) {
+          break;
+        }
+      }
+      DevicePathNode = NextDevicePathNode(DevicePathNode);
+    }
+  }
+
+  return;
+}
+
+VOID
+AsfLockLocalKeyboard ()
+{
+  EFI_STATUS      Status;
+  EFI_EVENT       EvtConInStarted;
+  VOID            *RegisterConInStarted;
+
+  if (mAsfBootOption.BootOptionBit[0] & ASF_BOP_BIT_LOCK_KEYBOARD) {
+    Status = gBS->CreateEvent (
+                        EVT_NOTIFY_SIGNAL,
+                        TPL_CALLBACK,
+                        EventConInStartedCallback,
+                        NULL,
+                        &EvtConInStarted
+                        );
+    ASSERT_EFI_ERROR (Status);
+
+    Status = gBS->RegisterProtocolNotify (
+                        &gEfiSimpleTextInProtocolGuid,
+                        EvtConInStarted,
+                        &RegisterConInStarted
+                        );
+    ASSERT_EFI_ERROR (Status);
+  }
+}
+
 EFI_STATUS
 EFIAPI
 AsfDxeEntry (
@@ -182,6 +324,7 @@ AsfDxeEntry (
   AsfConfigurationDataReset();
 
   // Lock lock keyboard if needed
+  AsfLockLocalKeyboard();
 
   // Push "Motherboard init" message
   AsfPushMessage((UINT8 *)&mAsfMsgMotherBoardInit.Message.MessageNoRetransmit,
