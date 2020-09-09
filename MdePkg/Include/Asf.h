@@ -6,7 +6,7 @@
 #include <Pi/PiStatusCode.h>
 
 #define ASF_BIOS_WATCHDOG_TIMER           0       // Platform firmware
-#define ASF_OS_WATCHDOG_TIMER             0x48    // OS vendor         
+#define ASF_OS_WATCHDOG_TIMER             0x48    // OS vendor
 #define START_TIMER                       TRUE
 #define STOP_TIMER                        FALSE
 
@@ -43,7 +43,7 @@
 #define ASFMSG_SYSTEM_STATE_S5		        5 // S5/G2 "Soft-off"
 
 //Asf Boot Option special cmd
-#define ASF_SCMD_NOP                        0  
+#define ASF_SCMD_NOP                        0
 #define ASF_SCMD_FORCE_PXE_BOOT             1
 #define ASF_SCMD_FORCE_HARD_DRIVE_BOOT      2
 #define ASF_SCMD_FORCE_HARD_DRIVE_SAFE_BOOT 3
@@ -113,14 +113,14 @@ typedef struct _ASF_MSG_NORETRANSMIT {
   UINT8       Command;
   UINT8       Length;
   UINT8       SubCommand;
-  UINT8       VersionNumber;	
-  UINT8       EventSensorType;	
-  UINT8       EventType;	
-  UINT8       EventOffset;	
-  UINT8       EventSourceType;	
+  UINT8       VersionNumber;
+  UINT8       EventSensorType;
+  UINT8       EventType;
+  UINT8       EventOffset;
+  UINT8       EventSourceType;
   UINT8       EventSeverity;
-  UINT8       SensorDevice;	
-  UINT8       SensorNumber;	
+  UINT8       SensorDevice;
+  UINT8       SensorNumber;
   UINT8       Entity;
   UINT8       EntityInstance;
   UINT8       EventData1;
