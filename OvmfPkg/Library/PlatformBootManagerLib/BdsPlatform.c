@@ -1358,6 +1358,8 @@ PlatformBdsRestoreNvVarsFromHardDisk (
 
 }
 
+extern EFI_GUID gAmdBdsConnectAllDriversDoneGuid;
+
 /**
   Connect with predefined platform connect sequence.
 
@@ -1370,6 +1372,7 @@ PlatformBdsConnectSequence (
 {
   UINTN         Index;
   RETURN_STATUS Status;
+
 
   DEBUG ((EFI_D_INFO, "PlatformBdsConnectSequence\n"));
 
@@ -1501,7 +1504,18 @@ PlatformBootManagerAfterConsole (
   //
   PlatformBdsConnectSequence ();
 
+
   EfiBootManagerRefreshAllBootOption ();
+
+    {
+    EFI_HANDLE    Handle;
+    DEBUG ((DEBUG_INFO, "%a: Install gAmdBdsConnectAllDriversDoneGuid to notify\n", __FUNCTION__));
+    gBS->InstallProtocolInterface (
+                          &Handle,
+                          &gAmdBdsConnectAllDriversDoneGuid,
+                          EFI_NATIVE_INTERFACE,
+                          NULL);
+  }
 
   //
   // Register UEFI Shell

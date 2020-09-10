@@ -11,6 +11,7 @@
 #include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
 #include <Library/HobLib.h>
+#include <Library/PrintLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DevicePathLib.h>
 #include <Guid/GlobalVariable.h>
@@ -26,6 +27,10 @@
 
 #ifndef EFI_SW_DXE_BS_EC_NO_BOOT_MEDIA
 #define EFI_SW_DXE_BS_EC_NO_BOOT_MEDIA      (EFI_SUBCLASS_SPECIFIC | 0x00000001)
+#endif
+
+#ifndef DXE_BDS_CONNECT_DRIVERS
+#define DXE_BDS_CONNECT_DRIVERS (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_PC_BEGIN_CONNECTING_DRIVERS)
 #endif
 
 static const ASF_MESSAGE mAsfMsgHddInit = \
@@ -617,6 +622,7 @@ ASF_MESSAGE mAsfErrorMsgList[] = {
 };
 
 ASF_BOOT_OPTION mAsfBootOption;
+BOOLEAN         mIsHddDetected = FALSE;
 
 
 EFI_STATUS

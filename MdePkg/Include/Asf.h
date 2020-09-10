@@ -102,10 +102,10 @@ typedef struct _ASF_BOOT_OPTION
 	UINT8       SubCommand;
 	UINT8       VersionNumber;
 	UINT8       IANAId[4];
-	UINT8       SpecialCmd;
-	UINT8       SpecCmdParamHighByte;
-  UINT8       SpecCmdParamLowByte;
-	UINT8       BootOptionBit[2];
+  UINT8       SpecialCmd;
+  UINT8       SpecialCmdParamHighByte;
+  UINT8       SpecialCmdParamLowByte;
+  UINT8       BootOptionBit[2];
 	UINT8       OEMParam[2];
 } ASF_BOOT_OPTION;
 
