@@ -583,21 +583,6 @@ static const ASF_MESSAGE mAsfMsgStopWatchdogTimer = \
   L"ASF - Stop Watchdog Timer"
 };
 
-static const ASF_MESSAGE mAsfMsgClearBootOption = \
-{
-  MsgClearBootOption,
-  {
-    {
-      ASFMSG_CMD_CONFIG,  // Command
-      0x02,               // Length
-      ASFMSG_SUBCMD_CLR_BOOT_OPTION,  //SubCommand
-      0x10                // VersionNumber
-    }
-  },
-  0, //Not valid
-  L"ASF - Clear Boot Option"
-};
-
 ASF_MESSAGE mAsfProgressMsgList[] = {
   mAsfMsgHddInit,
   mAsfMsgApInit,
@@ -621,7 +606,6 @@ ASF_MESSAGE mAsfErrorMsgList[] = {
   mAsfMsgNoBootMedia
 };
 
-ASF_BOOT_OPTION mAsfBootOption;
 BOOLEAN         mIsHddDetected = FALSE;
 
 

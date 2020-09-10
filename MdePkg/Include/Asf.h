@@ -91,10 +91,9 @@ typedef enum {
 } ASF_MESSAGE_TYPE;
 
 #pragma pack (1)
-/**
-  This is the ASF Boot Option data structure.
-
-**/
+/*
+  ASF Boot Option message structure.
+*/
 typedef struct _ASF_BOOT_OPTION
 {
   UINT8       Command;
@@ -109,6 +108,10 @@ typedef struct _ASF_BOOT_OPTION
 	UINT8       OEMParam[2];
 } ASF_BOOT_OPTION;
 
+
+/*
+  ASF NO-Retransmit message structure
+*/
 typedef struct _ASF_MSG_NORETRANSMIT {
   UINT8       Command;
   UINT8       Length;
@@ -131,7 +134,9 @@ typedef struct _ASF_MSG_NORETRANSMIT {
   UINT8       EventData6;
 } ASF_MSG_NORETRANSMIT;
 
-
+/*
+  ASF Start Watchdog message structure
+*/
 typedef struct _ASF_START_WATCHDOG {
 	UINT8       Command;
 	UINT8       Length;
@@ -155,9 +160,9 @@ typedef struct _ASF_START_WATCHDOG {
   UINT8       EventData6;
 } ASF_START_WATCHDOG;
 
-/**
-  This is the ASF START WatchDog Timer Data structure.
-**/
+/*
+  ASF Stop Watchdog message structure
+*/
 typedef struct _ASF_STOP_WATCHDOG
 {
 	UINT8       Command;
@@ -166,9 +171,9 @@ typedef struct _ASF_STOP_WATCHDOG
 	UINT8       VersionNumber;
 } ASF_STOP_WATCHDOG;
 
-/**
- * This is the ASF System state data structure.
-**/
+/*
+  ASF System state messgae structure.
+*/
 typedef struct _ASF_SYSTEM_STATE
 {
   UINT8       Command;
@@ -200,7 +205,6 @@ typedef struct {
     ASF_MSG_NORETRANSMIT      MessageNoRetransmit;
     ASF_START_WATCHDOG        StartWdtMessage;
     ASF_STOP_WATCHDOG         StopWatchdogMessage;
-    ASF_BOOT_OPTION           BootOption;
     ASF_SYSTEM_STATE          SystemState;
   } Message;
   EFI_STATUS_CODE_VALUE       StatusCode;

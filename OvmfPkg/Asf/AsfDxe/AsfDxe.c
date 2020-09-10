@@ -15,15 +15,6 @@
 //   // UINT64                    MonotonicCount;
 // }
 
-VOID
-ClearPowerButtonSmi (
-  IN UINT8    BootOption
-)
-{
-  if (BootOption & ASF_BOP_BIT_LOCK_POWER_BUTTON) {
-    // TODO: disable power button SMI
-  }
-}
 
 EFI_STATUS
 EFIAPI
@@ -54,9 +45,6 @@ AsfRscHandlerCallBack (
       }
     }
 
-    if (Value == DXE_BDS_CONNECT_DRIVERS) {
-      ClearPowerButtonSmi(mAsfBootOption.BootOptionBit[0]);
-    }
     if (mAsfProgressMsgList[Index].Type == MsgHddInit) {
       mIsHddDetected = TRUE;
     }
@@ -136,44 +124,6 @@ AsfPushMessage (
   // Status = BiosMpmAlertMsg(Msg, Size); TODO: uncomment it when merge to AMD CODE
 
   return Status;
-}
-
-EFI_STATUS
-AsfGetBootOption ()
-{
-  EFI_STATUS          Status = EFI_SUCCESS;
-  ASF_BOOT_OPTION     BootOption;
-
-  SetMem(&BootOption, sizeof(ASF_BOOT_OPTION), 0x00);
-
-  // TODO : Call MPM Interface to get boot option
-
-  if (EFI_ERROR(Status)) {
-    return EFI_UNSUPPORTED;
-  }
-
-  if (BootOption.SubCommand == ASFMSG_SUBCMD_RET_BOOT_OPTION) {
-    CopyMem(&mAsfBootOption, &BootOption, sizeof(ASF_BOOT_OPTION));
-
-    AsfPushMessage((UINT8 *)&mAsfMsgClearBootOption.Message.BootOption,
-                    mAsfMsgClearBootOption.Message.BootOption.Length + 2,
-                    mAsfMsgClearBootOption.MessageString);
-  }
-
-  return Status;
-}
-
-VOID
-AsfConfigurationDataReset()
-{
-  // UINTN         Length;
-  // UINT32        Attribute;
-  // EFI_STATUS    Status;
-
-  if (mAsfBootOption.BootOptionBit[0] & ASF_BOP_BIT_CONFIGURATION_DATA_RESET) {
-    // reset setup data
-    ;
-  }
 }
 
 VOID
@@ -293,188 +243,6 @@ EventConInStartedCallback (
 }
 
 VOID
-AsfLockLocalKeyboard ()
-{
-  EFI_STATUS      Status;
-  EFI_EVENT       EvtConInStarted;
-  VOID            *RegisterConInStarted;
-
-  if (mAsfBootOption.BootOptionBit[0] & ASF_BOP_BIT_LOCK_KEYBOARD) {
-    Status = gBS->CreateEvent (
-                        EVT_NOTIFY_SIGNAL,
-                        TPL_CALLBACK,
-                        EventConInStartedCallback,
-                        NULL,
-                        &EvtConInStarted
-                        );
-    ASSERT_EFI_ERROR (Status);
-
-    Status = gBS->RegisterProtocolNotify (
-                        &gEfiSimpleTextInProtocolGuid,
-                        EvtConInStarted,
-                        &RegisterConInStarted
-                        );
-    ASSERT_EFI_ERROR (Status);
-  }
-}
-
-EFI_STATUS
-UefiBootOverride()
-{
-  EFI_STATUS          Status;
-  UINT16              *BootOrder = NULL;
-  UINT16              *Ptr16;
-  UINT16              BootType;
-  UINT16              BootSubType;
-  UINT8               BootParameter;
-  UINT16              BootCount;
-  VOID                *Buffer;
-  CHAR16              BootOptionName[9];
-  UINTN               BootOrderSize;
-  UINTN               VariableSize;
-  UINTN               Index;
-  EFI_DEVICE_PATH_PROTOCOL    *DevicePathNode = NULL;
-  UINT16              LegacyBootOrder = 0;
-  BOOLEAN             LegacyBootOrderFound = FALSE;
-
-  DEBUG ((DEBUG_INFO, "%a\n", __FUNCTION__));
-
-
-  {
-    //test only
-    mAsfBootOption.SpecialCmd = 2;
-    mAsfBootOption.SpecialCmdParamHighByte = 1;
-  }
-
-  if (mAsfBootOption.SpecialCmd == 0) {
-    return EFI_UNSUPPORTED;
-  }
-
-  BootParameter = mAsfBootOption.SpecialCmdParamHighByte;
-
-  switch (mAsfBootOption.SpecialCmd) {
-    case 0x1:
-      // Force PXE Boot
-      BootType = MESSAGING_DEVICE_PATH;
-      BootSubType = MSG_MAC_ADDR_DP;
-      break;
-
-    case 0x2:
-      // Force Hard-drive Boot
-    case 0x3:
-      // Force Hard-drive Safe Mode Boot
-      BootType = MEDIA_DEVICE_PATH;
-      BootSubType = MEDIA_HARDDRIVE_DP;
-      {
-        // TODO debug only
-        BootType = MESSAGING_DEVICE_PATH;
-        BootSubType = MSG_SATA_DP;
-      }
-      if (BootParameter >= 1) {
-        BootParameter -= 1;
-      }
-      break;
-    case 0x4:
-      // Force Diagostic Boot
-      break;
-    case 0x5:
-      // Force CD/DVD Boot
-      BootType = MEDIA_DEVICE_PATH;
-      BootSubType = MEDIA_CDROM_DP;
-      if (BootParameter >= 1) {
-        BootParameter -= 1;
-      }
-      break;
-    default:
-      return EFI_SUCCESS;
-  }
-
-  Status = gBS->AllocatePool(EfiBootServicesData, 0x1000, &Buffer);
-  if (EFI_ERROR(Status)) {
-    return Status;
-  }
-
-  BootOrder = (UINT16 *)((UINT8 *)Buffer + 0xF00);
-  BootOrderSize = 0x100;
-
-  Status = gRT->GetVariable(L"BootOrder",
-                            &gEfiGlobalVariableGuid,
-                            NULL,
-                            &BootOrderSize,
-                            BootOrder);
-
-  if (EFI_ERROR(Status)) {
-    goto EXIT;
-  }
-
-  for (Index = 0, BootCount = 0; Index < (BootOrderSize / sizeof(UINT16)); Index++) {
-    UnicodeSPrint (BootOptionName, sizeof(BootOptionName), L"Boot%04x", BootOrder[Index]);
-    VariableSize = 0xF00;
-    Status = gRT->GetVariable (BootOptionName,
-                              &gEfiGlobalVariableGuid,
-                              NULL,
-                              &VariableSize,
-                              Buffer);
-    if (EFI_ERROR(Status)) {
-      goto EXIT;
-    }
-
-    for (Ptr16 = (UINT16 *)((UINT8 *)Buffer + 6); *Ptr16 != 0; Ptr16++);
-    DevicePathNode = (EFI_DEVICE_PATH_PROTOCOL *)++Ptr16;
-
-    DEBUG ((EFI_D_ERROR, "\n%a: DevicePath=%s\n", __FUNCTION__, ConvertDevicePathToText(DevicePathNode, FALSE, FALSE)));
-
-    while (!IsDevicePathEndType(DevicePathNode)) {
-      DEBUG ((DEBUG_INFO, "%a: DevicePath Type=0x%x\n", __FUNCTION__, DevicePathNode->Type));
-      DEBUG ((DEBUG_INFO, "%a: DevicePath SubType=0x%x\n", __FUNCTION__, DevicePathNode->SubType));
-
-      if ((DevicePathNode->Type == MESSAGING_DEVICE_PATH) && (DevicePathNode->SubType == MSG_USB_DP)) {
-        break;
-      }
-      if ((DevicePathNode->Type == BootType) && (DevicePathNode->SubType == BootSubType)) {
-        if (BootParameter != BootCount++) {
-          break;
-        }
-        DEBUG ((DEBUG_INFO, "%a: Update the BootNext variable\n", __FUNCTION__));
-        VariableSize = sizeof(UINT16);
-        Status = gRT->SetVariable(L"BootNext",
-                                  &gEfiGlobalVariableGuid,
-                                  (EFI_VARIABLE_BOOTSERVICE_ACCESS |\
-                                  EFI_VARIABLE_NON_VOLATILE |\
-                                  EFI_VARIABLE_RUNTIME_ACCESS),
-                                  VariableSize,
-                                  &BootOrder[Index]);
-        goto EXIT;
-      }
-      if ((DevicePathNode->Type == BBS_DEVICE_PATH) &&
-          (DevicePathNode->SubType == BBS_BBS_DP) &&
-          (LegacyBootOrderFound == FALSE)) {
-            LegacyBootOrder = BootOrder[Index];
-            LegacyBootOrderFound = TRUE;
-      }
-      DevicePathNode = NextDevicePathNode(DevicePathNode);
-    }
-  }
-
-  // No UEFI Boot device found, try to do legacy boot override
-  if (LegacyBootOrderFound) {
-    DEBUG ((DEBUG_INFO, "%a: Update the BootNext variable with legacy boot order\n", __FUNCTION__));
-    VariableSize = sizeof(UINT16);
-    Status = gRT->SetVariable(L"BootNext",
-                              &gEfiGlobalVariableGuid,
-                              (EFI_VARIABLE_BOOTSERVICE_ACCESS |\
-                                EFI_VARIABLE_NON_VOLATILE |\
-                                EFI_VARIABLE_RUNTIME_ACCESS),
-                                VariableSize,
-                                &LegacyBootOrder);
-  }
-
-EXIT:
-  gBS->FreePool(Buffer);
-  return Status;
-}
-
-VOID
 EFIAPI
 AsfEventAllDriversConnectedCallback (
   IN EFI_EVENT      Event,
@@ -498,9 +266,6 @@ AsfEventAllDriversConnectedCallback (
     DEBUG ((DEBUG_INFO, "Failed to locate gAmdBdsConnectAllDriversDoneGuid\n"));
     return;
   }
-
-  DEBUG ((DEBUG_INFO, "%a: Process UEFI BOOT Override at AllDriverConnected Event\n", __FUNCTION__));
-  UefiBootOverride();
 
   if (!mIsHddDetected) {
     AsfPushMessage((UINT8 *)&mAsfMsgHddFailure.Message.MessageNoRetransmit,
@@ -538,15 +303,6 @@ AsfDxeEntry (
   VOID          *Registration;
 
   // Check MPM Enable
-
-  // ASF Get Boot Option
-  AsfGetBootOption();
-
-  // Configuration Data Reset if needed
-  AsfConfigurationDataReset();
-
-  // Lock lock keyboard if needed
-  AsfLockLocalKeyboard();
 
   // Push "Motherboard init" message
   AsfPushMessage((UINT8 *)&mAsfMsgMotherBoardInit.Message.MessageNoRetransmit,
