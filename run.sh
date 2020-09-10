@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+BUILDPATH="Build"
 FVPATH="Build/OvmfX64/DEBUG_GCC5/FV"
 APPPATH="Build/OvmfX64/DEBUG_GCC5/X64"
 DISKIMG="Qemu/Images/disk.img"
@@ -80,7 +81,7 @@ w" | fdisk $DISKIMG
                      -hda $DISKIMG
 fi
 
-find $FVPATH | xargs chown shannon
+find $BUILDPATH | xargs chown shannon
 
 echo "Please find the BIOS log at Qemu/Log/debug.log"
 cp $LOGFILE ./
