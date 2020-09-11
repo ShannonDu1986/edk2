@@ -31,15 +31,11 @@ AsfRscHandlerCallBack (
   UINTN                 Count;
 
   DEBUG ((DEBUG_INFO, "%a: CodeType=0x%x, Value=0x%x\n", __FUNCTION__, CodeType, Value));
-  // if () {
-  //   AsfPushMessage();
-  // }
+
   Count = sizeof(mAsfProgressMsgList) / sizeof (ASF_MESSAGE);
   for (Index = 0; Index < Count; Index++) {
     if (mAsfProgressMsgList[Index].StatusCode == Value) {
-      Status = AsfPushMessage((UINT8 *)&mAsfProgressMsgList[Index].Message.MessageNoRetransmit,
-                      mAsfProgressMsgList[Index].Message.MessageNoRetransmit.Length + 2,
-                      mAsfProgressMsgList[Index].MessageString);
+      Status = AsfPushMessage(mAsfProgressMsgList[Index]);
       if (EFI_ERROR(Status)) {
         break;
       }
@@ -53,9 +49,7 @@ AsfRscHandlerCallBack (
   Count = sizeof(mAsfErrorMsgList) / sizeof (ASF_MESSAGE);
   for (Index = 0; Index < Count; Index++) {
     if (mAsfErrorMsgList[Index].StatusCode == Value) {
-      Status = AsfPushMessage((UINT8 *)&mAsfErrorMsgList[Index].Message.MessageNoRetransmit,
-                      mAsfErrorMsgList[Index].Message.MessageNoRetransmit.Length + 2,
-                      mAsfErrorMsgList[Index].MessageString);
+      Status = AsfPushMessage(mAsfErrorMsgList[Index]);
       if (EFI_ERROR(Status)) {
         break;
       }
@@ -78,26 +72,21 @@ AsfReadyToBootCallBack (
   // Create ASF SMBIOS Structure Type 129
 
   // Stop BIOS Watchdog timer if needed
-  AsfPushMessage((UINT8 *)&mAsfMsgStopWatchdogTimer.Message.StopWatchdogMessage,
-                  mAsfMsgStopWatchdogTimer.Message.StopWatchdogMessage.Length + 2,
-                  mAsfMsgStopWatchdogTimer.MessageString);
+  AsfPushMessage(mAsfMsgStopWatchdogTimer);
+
 
   // Start OS Watchdog timer if enabled
-  AsfPushMessage((UINT8 *)&mAsfMsgStartOsWatchdogTimer.Message.StartWdtMessage,
-                  mAsfMsgStartOsWatchdogTimer.Message.StartWdtMessage.Length + 2,
-                  mAsfMsgStartOsWatchdogTimer.MessageString);
+  AsfPushMessage(mAsfMsgStartOsWatchdogTimer);
 
   //Push System State S0 - "Working"
-  AsfPushMessage((UINT8 *)&mAsfSystemStateS0.Message.SystemState,
-                  mAsfSystemStateS0.Message.SystemState.Length + 2,
-                  mAsfSystemStateS0.MessageString);
+  AsfPushMessage(mAsfSystemStateS0);
 
   gBS->CloseEvent(Event);
   return;
 }
 
 EFI_STATUS
-AsfPushMessage (
+AsfPushMessageMpm (
   IN UINT8        *Msg,
   IN UINT32       Size,
   IN const UINT16 *MsgStr OPTIONAL
@@ -122,6 +111,40 @@ AsfPushMessage (
   }
 
   // Status = BiosMpmAlertMsg(Msg, Size); TODO: uncomment it when merge to AMD CODE
+
+  return Status;
+}
+
+EFI_STATUS
+AsfPushMessage (
+  IN ASF_MESSAGE  Msg
+)
+{
+  EFI_STATUS    Status = EFI_NOT_FOUND;
+  switch (Msg.FormatType) {
+    case MsgFormatTypeNoRetransmit:
+      Status = AsfPushMessageMpm((UINT8 *)&Msg.Message.MessageNoRetransmit,
+                                Msg.Message.MessageNoRetransmit.Length + 2,
+                                Msg.MessageString);
+      break;
+    case MsgFormatTypeStartWatchdog:
+      Status = AsfPushMessageMpm((UINT8 *)&Msg.Message.StartWatchdogMessage,
+                                Msg.Message.StartWatchdogMessage.Length + 2,
+                                Msg.MessageString);
+      break;
+    case MsgFormatTypeStopWatchdog:
+      Status = AsfPushMessageMpm((UINT8 *)&Msg.Message.StopWatchdogMessage,
+                                Msg.Message.StopWatchdogMessage.Length + 2,
+                                Msg.MessageString);
+      break;
+    case MsgFormatTypeSystemState:
+      Status = AsfPushMessageMpm((UINT8 *)&Msg.Message.SystemState,
+                                Msg.Message.SystemState.Length + 2,
+                                Msg.MessageString);
+      break;
+    default:
+      break;
+  }
 
   return Status;
 }
@@ -268,17 +291,13 @@ AsfEventAllDriversConnectedCallback (
   }
 
   if (!mIsHddDetected) {
-    AsfPushMessage((UINT8 *)&mAsfMsgHddFailure.Message.MessageNoRetransmit,
-                    mAsfMsgHddFailure.Message.MessageNoRetransmit.Length + 2,
-                    mAsfMsgHddFailure.MessageString);
+    AsfPushMessage(mAsfMsgHddFailure);
   }
 
   GetEfiGlobalVariable2 (EFI_BOOT_ORDER_VARIABLE_NAME, (VOID **) &BootOrderList, &BootOrderListSize);
   if (BootOrderList == NULL) {
     Status = EFI_NOT_FOUND;
-    AsfPushMessage((UINT8 *)&mAsfMsgNoBootMedia.Message.MessageNoRetransmit,
-                    mAsfMsgNoBootMedia.Message.MessageNoRetransmit.Length + 2,
-                    mAsfMsgNoBootMedia.MessageString);
+    AsfPushMessage(mAsfMsgNoBootMedia);
   } else {
     DEBUG ((DEBUG_INFO, "%a: BootOrderListSize=0x%x\n", __FUNCTION__, BootOrderListSize / sizeof (UINT16)));
   }
@@ -305,37 +324,10 @@ AsfDxeEntry (
   // Check MPM Enable
 
   // Push "Motherboard init" message
-  AsfPushMessage((UINT8 *)&mAsfMsgMotherBoardInit.Message.MessageNoRetransmit,
-                  mAsfMsgMotherBoardInit.Message.MessageNoRetransmit.Length + 2,
-                  mAsfMsgMotherBoardInit.MessageString);
+  AsfPushMessage(mAsfMsgMotherBoardInit);
 
   // Start BIOS Watchdog timer if needed
-  AsfPushMessage((UINT8 *)&mAsfMsgStartBiosWatchdogTimer.Message.StartWdtMessage,
-                  mAsfMsgStartBiosWatchdogTimer.Message.StartWdtMessage.Length + 2,
-                  mAsfMsgStartBiosWatchdogTimer.MessageString);
-
-  // // Locate DataHub protocol
-  // Status = gBS->LocateProtocol (&gEfiDataHubProtocolGuid, NULL, (VOID *)&DataHub);
-  // if (EFI_ERROR(Status)) {
-  //   return EFI_UNSUPPORTED;
-  // }
-
-  // // Create Progress/Error class code of data hub event for ASF messages
-  // Status = gBS->CreateEvent ( EVT_NOTIFY_SIGNAL,
-  //                             TPL_CALLBACK,
-  //                             AsfEventCallBack,
-  //                             NULL,
-  //                             &AsfEvent );
-
-  // if (EFI_ERROR(Status)) {
-  //   return Status;
-  // }
-  // // Register Filter Driver for Progress/Error Class Code of Data Hub
-  // DataClass = EFI_DATA_RECORD_CLASS_ERROR | EFI_DATA_RECORD_CLASS_PROGRESS_CODE;
-  // Status = DataHub->RegisterFilterDriver (DataHub, AsfEvent, TPL_APPLICATION, DataClass, NULL);
-  // if (EFI_ERROR(Status)) {
-  //   return Status;
-  // }
+  AsfPushMessage(mAsfMsgStartBiosWatchdogTimer);
 
   // Register RscHandler protocol
   Status = gBS->LocateProtocol(&gEfiRscHandlerProtocolGuid, NULL, (VOID *)&RscHandler);

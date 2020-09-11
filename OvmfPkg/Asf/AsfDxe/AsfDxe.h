@@ -36,6 +36,7 @@
 static const ASF_MESSAGE mAsfMsgHddInit = \
 {
   MsgHddInit,
+  MsgFormatTypeNoRetransmit,
   {
     {
       0x04,   // Command
@@ -62,6 +63,7 @@ static const ASF_MESSAGE mAsfMsgHddInit = \
 static const ASF_MESSAGE mAsfMsgApInit = \
 {
   MsgApInit,
+  MsgFormatTypeNoRetransmit,
   {
     {
       0x04,   // Command
@@ -88,6 +90,7 @@ static const ASF_MESSAGE mAsfMsgApInit = \
 static const ASF_MESSAGE mAsfMsgUserInitSetup = \
 {
   MsgUserInitSetup,
+  MsgFormatTypeNoRetransmit,
   {
     {
       0x04,   // Command
@@ -114,6 +117,7 @@ static const ASF_MESSAGE mAsfMsgUserInitSetup = \
 static const ASF_MESSAGE mAsfMsgUsbResouceConfig = \
 {
   MsgUsbResourceConfig,
+  MsgFormatTypeNoRetransmit,
   {
     {
       0x04,   // Command
@@ -140,6 +144,7 @@ static const ASF_MESSAGE mAsfMsgUsbResouceConfig = \
 static const ASF_MESSAGE mAsfMsgPciResourceConfig = \
 {
   MsgPciResourceConfig,
+  MsgFormatTypeNoRetransmit,
   {
     {
       0x04,   // Command
@@ -166,6 +171,7 @@ static const ASF_MESSAGE mAsfMsgPciResourceConfig = \
 static const ASF_MESSAGE mAsfMsgVideoInit = \
 {
   MsgVideoInit,
+  MsgFormatTypeNoRetransmit,
   {
     {
       0x04,   // Command
@@ -192,6 +198,7 @@ static const ASF_MESSAGE mAsfMsgVideoInit = \
 static const ASF_MESSAGE mAsfMsgKbcInit = \
 {
   MsgKbcInit,
+  MsgFormatTypeNoRetransmit,
   {
     {
       0x04,   // Command
@@ -218,6 +225,7 @@ static const ASF_MESSAGE mAsfMsgKbcInit = \
 static const ASF_MESSAGE mAsfMsgKbcTest = \
 {
   MsgKbcTest,
+  MsgFormatTypeNoRetransmit,
   {
     {
       0x04,   // Command
@@ -244,6 +252,7 @@ static const ASF_MESSAGE mAsfMsgKbcTest = \
 static const ASF_MESSAGE mAsfMsgOsBoot = \
 {
   MsgOSBoot,
+  MsgFormatTypeNoRetransmit,
   {
     {
       0x04,   // Command
@@ -270,6 +279,7 @@ static const ASF_MESSAGE mAsfMsgOsBoot = \
 static const ASF_MESSAGE mAsfMsgMotherBoardInit = \
 {
   MsgMotherBoardInit,
+  MsgFormatTypeNoRetransmit,
   {
     {
       0x04,   // Command
@@ -296,6 +306,7 @@ static const ASF_MESSAGE mAsfMsgMotherBoardInit = \
 static const ASF_MESSAGE mAsfMsgNoVideo = \
 {
   MsgNoVideo,
+  MsgFormatTypeNoRetransmit,
   {
     {
       0x04,   // Command
@@ -322,6 +333,7 @@ static const ASF_MESSAGE mAsfMsgNoVideo = \
 static const ASF_MESSAGE mAsfMsgKbdFailure = \
 {
   MsgKbdFailure,
+  MsgFormatTypeNoRetransmit,
   {
     {
       0x04,   // Command
@@ -348,6 +360,7 @@ static const ASF_MESSAGE mAsfMsgKbdFailure = \
 static const ASF_MESSAGE mAsfMsgHddFailure = \
 {
   MsgHddFailure,
+  MsgFormatTypeNoRetransmit,
   {
     {
       0x04,   // Command
@@ -374,6 +387,7 @@ static const ASF_MESSAGE mAsfMsgHddFailure = \
 static const ASF_MESSAGE mAsfMsgChassisIntrusion = \
 {
   MsgChassisIntrusion,
+  MsgFormatTypeNoRetransmit,
   {
     {
       0x04,   // Command
@@ -398,6 +412,7 @@ static const ASF_MESSAGE mAsfMsgChassisIntrusion = \
 static const ASF_MESSAGE mAsfMsgUserPasswordInvalid = \
 {
   MsgUserPasswordInvalid,
+  MsgFormatTypeNoRetransmit,
   {
     {
       0x04,   // Command
@@ -422,6 +437,7 @@ static const ASF_MESSAGE mAsfMsgUserPasswordInvalid = \
 static const ASF_MESSAGE mAsfMsgNoBootMedia = \
 {
   MsgNoBootMedia,
+  MsgFormatTypeNoRetransmit,
   {
     {
       0x04,   // Command
@@ -448,6 +464,7 @@ static const ASF_MESSAGE mAsfMsgNoBootMedia = \
 ASF_MESSAGE mAsfSystemStateS0 = \
 {
   MsgSystemStateS0,
+  MsgFormatTypeSystemState,
   {
     {
       0x01,   // Command
@@ -464,6 +481,7 @@ ASF_MESSAGE mAsfSystemStateS0 = \
 ASF_MESSAGE mAsfSystemStateS3 = \
 {
   MsgSystemStateS3,
+  MsgFormatTypeSystemState,
   {
     {
       0x01,   // Command
@@ -480,6 +498,7 @@ ASF_MESSAGE mAsfSystemStateS3 = \
 ASF_MESSAGE mAsfSystemStateS4 = \
 {
   MsgSystemStateS4,
+  MsgFormatTypeSystemState,
   {
     {
       0x01,   // Command
@@ -496,6 +515,7 @@ ASF_MESSAGE mAsfSystemStateS4 = \
 ASF_MESSAGE mAsfSystemStateS5 = \
 {
   MsgSystemStateS5,
+  MsgFormatTypeSystemState,
   {
     {
       0x01,   // Command
@@ -515,6 +535,7 @@ ASF_MESSAGE mAsfSystemStateS5 = \
 static const ASF_MESSAGE mAsfMsgStartBiosWatchdogTimer = \
 {
   MsgStartBiosWatchdogTimer,
+  MsgFormatTypeStartWatchdog,
   {
     {
       0x02,  // Command
@@ -543,6 +564,7 @@ static const ASF_MESSAGE mAsfMsgStartBiosWatchdogTimer = \
 static const ASF_MESSAGE mAsfMsgStartOsWatchdogTimer = \
 {
   MsgStartOsWatchdogTimer,
+  MsgFormatTypeStartWatchdog,
   {
     {
       0x02,  // Command
@@ -568,9 +590,11 @@ static const ASF_MESSAGE mAsfMsgStartOsWatchdogTimer = \
   L"ASF - Start OS Watchdog Timer"
 };
 
+
 static const ASF_MESSAGE mAsfMsgStopWatchdogTimer = \
 {
   MsgStopWatchdogtimer,
+  MsgFormatTypeStopWatchdog,
   {
     {
       0x02,  // Command
@@ -610,10 +634,15 @@ BOOLEAN         mIsHddDetected = FALSE;
 
 
 EFI_STATUS
-AsfPushMessage (
+AsfPushMessageMpm (
   IN UINT8        *Msg,
   IN UINT32       Size,
   IN const UINT16       *MsgStr    OPTIONAL
+);
+
+EFI_STATUS
+AsfPushMessage (
+  IN ASF_MESSAGE  Msg
 );
 
 #endif

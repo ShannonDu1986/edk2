@@ -135,7 +135,7 @@ AsfPeiEntry (
 
   // Push "BIOS Present" message 
   DEBUG ((DEBUG_INFO, "%a, push BIOS present message\n", __FUNCTION__));
-  AsfPushMessage((UINT8 *)&gAsfMsgStopWatchdogTimer, gAsfMsgStopWatchdogTimer.Length + 2);
+  AsfPushMessage((UINT8 *)&gAsfMsgBiosPresent, gAsfMsgBiosPresent.Length + 2);
 
 
   return Status;

@@ -68,12 +68,11 @@ ASF_MSG_NORETRANSMIT gAsfMsgMemoryMissing = \
   0x01    // EventData2
 };
 
-ASF_STOP_WATCHDOG gAsfMsgStopWatchdogTimer = \
-{
-  0x02,   // Command
-	0x02,   // Length
-	0x14,   // SubCommand
-	0x10,   // VersionNumber
+ASF_STOP_WATCHDOG gAsfMsgStopWatchdogTimer = {
+  0x02,  // Command
+  0x02,  // Length
+  0x14,  // SubCommand
+  0x10   // VersionNumber
 };
 
 ASF_MSG_NORETRANSMIT gAsfMsgBiosPresent = \
