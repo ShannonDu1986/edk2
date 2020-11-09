@@ -390,6 +390,9 @@ INF  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
 INF OvmfPkg/AmdManageabilityRecovery/AmdCpmManageabilityRecoveryDxe.inf
 INF OvmfPkg/Asf/AsfDxe/AsfDxe.inf
 
+# Amd MPM Serial driver
+INF OvmfPkg/AmdDrivers/MpmSerialIoDxe/MpmSerialIoDxe.inf
+
 ################################################################################
 
 [FV.FVMAIN_COMPACT]

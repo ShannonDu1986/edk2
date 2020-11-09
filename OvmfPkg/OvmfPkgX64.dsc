@@ -1029,3 +1029,6 @@
 
  OvmfPkg/AmdManageabilityRecovery/AmdCpmManageabilityRecoveryDxe.inf
  OvmfPkg/Asf/AsfDxe/AsfDxe.inf
+
+# Amd MPM Serial driver
+OvmfPkg/AmdDrivers/MpmSerialIoDxe/MpmSerialIoDxe.inf
