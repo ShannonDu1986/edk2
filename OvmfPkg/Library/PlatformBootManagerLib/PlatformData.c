@@ -173,6 +173,39 @@ STATIC VENDOR_UART_DEVICE_PATH gXenConsoleDevicePath = {
   gEndEntire
 };
 
+
+STATIC VENDOR_UART_DEVICE_PATH gMpmSerialDevicePath = {
+  {
+    {
+      HARDWARE_DEVICE_PATH,
+      HW_VENDOR_DP,
+      {
+        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+      }
+    },
+    EDKII_SERIAL_PORT_LIB_VENDOR_GUID
+  },
+  {
+    {
+      MESSAGING_DEVICE_PATH,
+      MSG_UART_DP,
+      {
+        (UINT8) (sizeof (UART_DEVICE_PATH)),
+        (UINT8) ((sizeof (UART_DEVICE_PATH)) >> 8)
+      }
+    },
+    0,
+    FixedPcdGet64 (PcdUartDefaultBaudRate),
+    FixedPcdGet8 (PcdUartDefaultDataBits),
+    FixedPcdGet8 (PcdUartDefaultParity),
+    FixedPcdGet8 (PcdUartDefaultStopBits),
+  },
+  gPcAnsiTerminal,
+  gEndEntire
+};
+
+
 //
 // Predefined platform default console device path
 //
@@ -184,6 +217,14 @@ PLATFORM_CONSOLE_CONNECT_ENTRY   gPlatformConsole[] = {
   {
     (EFI_DEVICE_PATH_PROTOCOL *)&gUsbKeyboardDevicePath,
     CONSOLE_IN
+  },
+  {
+    (EFI_DEVICE_PATH_PROTOCOL *)&gMpmSerialDevicePath,
+    CONSOLE_IN
+  },
+  {
+    (EFI_DEVICE_PATH_PROTOCOL *)&gMpmSerialDevicePath,
+    CONSOLE_OUT
   },
   {
     (EFI_DEVICE_PATH_PROTOCOL *)&gQemuRamfbDevicePath,

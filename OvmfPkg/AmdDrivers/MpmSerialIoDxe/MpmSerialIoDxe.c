@@ -100,7 +100,6 @@ SERIAL_DEVICE_PATH mSerialDevicePath = {
   }
 };
 
-
 EFI_SERIAL_IO_MODE mSerialIoMode = {
   0,        // ControlMask
   1000000,  // Timeout
@@ -460,7 +459,7 @@ SerialWrite (
   for (Index = 0; Index < *BufferSize; Index++) {
     if (myTestMode) {
       Status = EFI_SUCCESS;
-      DEBUG ((DEBUG_ERROR, "Shannon: w<%x>\n", ((UINT8 *)Buffer)[Index]));
+      DEBUG ((DEBUG_ERROR, "Shannon: w<0x%x>\n", ((UINT8 *)Buffer)[Index]));
     } else {
       Status = MpmTextWriteOneByte(This, ((UINT8 *)Buffer)[Index]);
     }
