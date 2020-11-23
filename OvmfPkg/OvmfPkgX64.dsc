@@ -1032,3 +1032,7 @@
 
 # Amd MPM Serial driver
 OvmfPkg/AmdDrivers/MpmSerialIoDxe/MpmSerialIoDxe.inf
+
+# AMD MPM Battery Info
+OvmfPkg/AmdDrivers/MpmBatteryInfo/Common/MpmBatteryInfo.inf
+OvmfPkg/AmdDrivers/MpmBatteryInfo/Platform/MpmBatteryInfoBoard.inf

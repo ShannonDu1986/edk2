@@ -393,6 +393,10 @@ INF OvmfPkg/Asf/AsfDxe/AsfDxe.inf
 # Amd MPM Serial driver
 INF OvmfPkg/AmdDrivers/MpmSerialIoDxe/MpmSerialIoDxe.inf
 
+# AMD MPM Battery Info
+INF OvmfPkg/AmdDrivers/MpmBatteryInfo/Common/MpmBatteryInfo.inf
+INF OvmfPkg/AmdDrivers/MpmBatteryInfo/Platform/MpmBatteryInfoBoard.inf
+
 ################################################################################
 
 [FV.FVMAIN_COMPACT]
